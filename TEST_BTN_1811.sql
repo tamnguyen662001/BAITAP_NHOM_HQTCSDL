@@ -241,6 +241,8 @@ INSERT HOA_DON_NHAP VALUES ('HDN05','05/10/2021','04','NCC5')
 INSERT HOA_DON_NHAP VALUES ('HDN06','03/01/2021','03','NCC4')
 INSERT HOA_DON_NHAP VALUES ('HDN07','05/10/2021','04','NCC5')
 
+
+
 --NHẬP DỮ LIỆU CHI TIẾT HÓA ĐƠN NHẬP
 INSERT CHI_TIET_HOA_DON_NHAP VALUES ('10','HDN01','NL01')
 INSERT CHI_TIET_HOA_DON_NHAP VALUES ('20','HDN03','NL03')
@@ -267,14 +269,16 @@ INSERT CHI_TIET_HOA_DON VALUES(8,'HD05','TH023')
 INSERT CHI_TIET_HOA_DON VALUES(10,'HD05','GK010')
 
 
---==================================================================================
+--=============================================== CÂU 3 ======================================
 -- Tâm c-1,  a-1,  f-1(Giao),  d-1(nhỏ nhất),  c-1,  e-1(Không),  b-1
 
 -- A 
--- CÂU 1 In ra danh sách các sản phẩm có dơn giá > 300000 
-SELECT A.MSP, A.TENSP, A.DONGIA
-FROM SAN_PHAM A
-WHERE A.DONGIA > 300000
+-- 1 TÍNH LÃI THEO TỪNG HOÁ ĐƠN HOÁ ĐƠN
+SELECT  A.MHD, ( SUM(B.SOLUONG*C.DONGIA) - SUM(E.DONGIA*D.SOLUONG*B.SOLUONG) ) AS N'LÃI'
+FROM HOA_DON A JOIN CHI_TIET_HOA_DON B ON A.MHD = B.MHD JOIN SAN_PHAM C ON B.MSP = C.MSP
+				JOIN CHI_TIET_SAN_PHAM D ON D.TENSP = C.TENSP JOIN NGUYEN_LIEU E ON D.MANL = E.MANL
+GROUP BY A.MHD
+
 
 
 -- B 
@@ -282,14 +286,15 @@ WHERE A.DONGIA > 300000
 SELECT COUNT(A.MKH) AS N'Số lượng hoá đơn của khách hàng nữ'
 FROM KHACH_HANG A JOIN HOA_DON B ON A.MKH = B.MKH
 WHERE A.GIOITINH = N'NỮ'
+SELECT * FROM HOA_DON
 
 -- C
 -- CÂU 3 Nhân viên lập 2 hoá đơn trong	quý 3 năm 2021
 SELECT A.TENNV,B.MNV,COUNT(B.MNV) AS SL_DON
 FROM NHAN_VIEN A JOIN HOA_DON B ON A.MNV = B.MNV
-WHERE MONTH(B.NGAYTAO) = 8 AND YEAR(B.NGAYTAO) = 2021
+WHERE DATEPART(QUARTER, B.NGAYTAO) = 3 AND YEAR(B.NGAYTAO) = 2021
 GROUP BY A.TENNV,B.MNV, (B.MNV) 
-HAVING COUNT(B.MNV) = 1
+HAVING COUNT(B.MNV) = 2
 
 -- CÂU 4 Món ăn có sô lượng được đặt lớn hơn 10 
 SELECT A.TENSP, SUM(B.SOLUONG) AS N'Sô lượng đặt'
@@ -299,6 +304,12 @@ HAVING SUM(B.SOLUONG) > 10
 
 -- D 
 -- CÂU 5 Thông tin nhân viên có tiên lương cao nhất 
+-- CÁCH HAY
+SELECT TOP (1) CC.MNV, SUM(LC.MUCTHUONG*CLV.GIATIEN) AS TIEN
+FROM CHAM_CONG CC JOIN LOAI_CA LC ON CC.MALOAICA = LC.MALOAICA
+	JOIN CA_LAM_VIEC CLV ON CC.MACA = CLV.MACA
+GROUP BY CC.MNV 
+ORDER BY SUM(LC.MUCTHUONG*CLV.GIATIEN) DESC
 
 SELECT TOP (1)A.MNV AS N'Mã NV', A.TENNV AS N'Nhân viên', SUM(LUONG.LUONG_THEOCA) AS N'Lương/tháng'
 FROM (SELECT A.MNV, A.CHUCVU, A.TENNV ,(CASE  
@@ -314,41 +325,12 @@ JOIN NHAN_VIEN A ON LUONG.MNV = A.MNV
 GROUP BY A.MNV,  A.TENNV
 ORDER BY SUM(LUONG.LUONG_THEOCA) DESC
 
---  5a PHỤ Lương của từng nhân viên theo ca
-SELECT A.MNV, A.CHUCVU, A.TENNV , ( CASE  
-										WHEN B.MALOAICA = 'NL' THEN ((COUNT(B.MACA)*D.GIATIEN*1.5))
-										WHEN B.MALOAICA = 'NN' THEN ((COUNT(B.MACA)*D.GIATIEN*1.2)) 
-										ELSE((COUNT(B.MaCa)*D.GIATIEN*1)) 
-									END) AS N'Lương/ca', B.MaCa AS N'Mã ca ',D.GIATIEN AS N'Đơn giá',c.MALOAICA AS N'Loại ca',C.MUCTHUONG AS N'Mức thưởng'
-FROM NHAN_VIEN A JOIN CHAM_CONG B ON A.MNV = B.MNV 
-				JOIN LOAI_CA C ON B.MALOAICA = C.MALOAICA 
-				JOIN CA_LAM_VIEC D ON B.MaCa = D.MaCa
-WHERE A.MNV = '04'  
-GROUP BY A.MNV, A.CHUCVU, A.TENNV, B.MaCa, B.MALOAICA, D.GIATIEN,C.MUCTHUONG,c.MALOAICA
-
-
--- 5b PHỤ Lương của tấc cả các nhân viên
-SELECT A.MNV, A.TENNV, SUM(LUONG.LUONG) AS TONG_LUONG
-FROM (SELECT A.MNV, A.CHUCVU, A.TENNV ,(CASE  
-											WHEN B.MALOAICA = 'NL' THEN ((COUNT(B.MACA)*D.GIATIEN*1.5))
-											WHEN B.MALOAICA = 'NN' THEN ((COUNT(B.MACA)*D.GIATIEN*1.2)) 
-											ELSE((COUNT(B.MACA)*D.GIATIEN*1)) 
-										END) AS LUONG
-	FROM NHAN_VIEN A JOIN CHAM_CONG B ON A.MNV = B.MNV 
-					 JOIN LOAI_CA C ON B.MALOAICA = C.MALOAICA 
-					 JOIN CA_LAM_VIEC D ON B.MACA = D.MACA
-	--WHERE A.MNV = '05'  
-	GROUP BY A.MNV, A.CHUCVU, A.TENNV, B.MaCa, B.MALOAICA, D.GIATIEN) LUONG 
-JOIN NHAN_VIEN A ON LUONG.MNV = A.MNV
-GROUP BY A.MNV,  A.TENNV
-
-
 
 -- E 
 --CÂU 6 Nhân viên chưa nhập một hoá đơn nào trong năm 2021
 SELECT A1.MNV AS N'Mã NV', A1.TENNV AS N'Nhân viên'
 FROM NHAN_VIEN A1 
-WHERE A1.MNV NOT IN (SELECT A.MNV 
+WHERE A1.MNV NOT IN (SELECT  DISTINCT A.MNV 
 					 FROM NHAN_VIEN A JOIN HOA_DON B ON A.MNV  = B.MNV 
 					 WHERE YEAR(B.NGAYTAO) = 2021)
 
@@ -366,5 +348,257 @@ WHERE NOT EXISTS
 									WHERE B1.MNV=B2.MNV AND C.MACA = B2.MACA ))
 GROUP BY A.TENNV, A.MNV
 
+--===================================================================================
+-- CÂU 8 Số tiền phải trả của mỗi khách hàngcho hoá đơn của mình
+SELECT D.TENKH ,A.MHD, SUM(B.SOLUONG * C.DONGIA) AS N'Thành tiền'
+FROM HOA_DON A  JOIN CHI_TIET_HOA_DON B ON A.MHD = B.MHD 
+				JOIN SAN_PHAM C ON B.MSP = C.MSP 
+				JOIN KHACH_HANG D ON D.MKH = A.MKH
+GROUP BY A.MHD ,D.TENKH
+-- CÂU 9 Tổng tiền thanh toán cho các đơn nhập của nhà hàng 
+
+--====================================================================================
+
+-- TRÂM 
+
+-- 1E Hiển thị nhà cung cấp chưa nhập nguyên liệu vào tháng 12 năm 2021
+SELECT MANCC ,TENNCC 
+FROM NHA_CUNG_CAP
+WHERE MANCC NOT IN (
+		SELECT MANCC 
+		FROM HOA_DON_NHAP 
+		WHERE MONTH(NGAYTAO) = 12 AND YEAR(NGAYTAO) = 2021  )
+
+-- 2G Cập nhập lại số tiền công của ca đặc biệt +1đ
+UPDATE LOAI_CA
+SET MUCTHUONG = MUCTHUONG + 0.5
+WHERE MALOAICA = 'NL'
+
+-- 3D (max)-Hiển thị tên nguyen liệu và tên nhà cung cấp được nhập vào có số lượng nhiều nhất 
+SELECT NCC.TENNCC ,NL.TENNL, CT.SOLUONG
+FROM CHI_TIET_HOA_DON_NHAP CT JOIN HOA_DON_NHAP HDN  ON  CT.MHD = HDN.MHD
+							  JOIN NHA_CUNG_CAP NCC ON HDN.MANCC = NCC.MANCC	
+							  JOIN NGUYEN_LIEU NL ON NL.MANL = CT.MANL
+WHERE SOLUONG > = ( SELECT  MAX(SOLUONG) AS [NL_MAX] FROM CHI_TIET_HOA_DON_NHAP )
 
 
+
+-- 4B  Số món ăn của từng nguyên liệu.
+SELECT COUNT(A.TENSP) AS [SL_SP] ,A.MANL	, B.TENNL	
+FROM CHI_TIET_SAN_PHAM A JOIN NGUYEN_LIEU  B ON A.MANL  = B.MANL
+GROUP BY A.MANL, B.TENNL	
+
+
+--5G (Delete) Xóa món ăn được chế biến từ nguyển liệu có mã là NL03. ?
+
+ALTER TABLE CHI_TIET_SAN_PHAM
+DROP CONSTRAINT FK_CHI_TIET_SAN_PHAM_SAN_PHAM;
+	
+ALTER TABLE CHI_TIET_SAN_PHAM
+ADD CONSTRAINT FK_CHI_TIET_SAN_PHAM_SAN_PHAM
+FOREIGN KEY (MANL) 
+REFERENCES SAN_PHAM(MANL)
+ON DELETE CASCADE;
+
+DELETE
+FROM SAN_PHAM
+WHERE SAN_PHAM.TENSP =  (
+		SELECT CHI_TIET_SAN_PHAM.TENSP
+		FROM CHI_TIET_SAN_PHAM
+		WHERE MANL ='NL03'
+		)
+
+
+-- 6E (Chưa có) Hiển thị nhân viên chưa làm ca đặc biệt nào
+SELECT MNV ,TENNV
+FROM NHAN_VIEN
+WHERE MNV NOT IN (
+	SELECT DISTINCT MNV 
+	FROM CHAM_CONG
+	WHERE MALOAICA ='NL' )
+
+--7E  (Khong) Hiển thị nhà cung cấp không cung cấp nguyên liệu nào vào năn 2021 
+SELECT NCC.MANCC ,NCC.TENNCC 
+FROM NHA_CUNG_CAP NCC JOIN HOA_DON_NHAP HDN ON NCC.MANCC = HDN.MANCC
+WHERE NCC.MANCC NOT IN 
+	(SELECT DISTINCT MANCC FROM HOA_DON_NHAP
+	WHERE YEAR(NGAYTAO) = 2021)  
+
+--=====================================================================================
+
+-- DUY 
+
+-- 1C nguyên liệu có đơn giá lớn nhât
+SELECT A.TENNL, A.DONGIA
+FROM NGUYEN_LIEU A 
+GROUP BY A.TENNL, A.DONGIA
+HAVING A.DONGIA >= ALL (SELECT A1.DONGIA
+						FROM NGUYEN_LIEU A1)
+-- 2B CÂUb đếm số nhân viên
+SELECT COUNT(n.MNV)
+FROM nhan_vien n 
+WHERE n.GIOITINH = N'nữ'
+
+-- 3G CẬP NHẬT MÃ NHÀ CUNG CẤP
+UPDATE NHA_CUNG_CAP
+SET MANCC = '01-HN'
+WHERE DIACHI = N'HÀ NỘI'
+-- 4G XOÁ CÁC CA LÀM TRONG NGÀY 20/11
+DELETE FROM CHAM_CONG 
+WHERE MNV = '02' AND NGAY= '2021-20-11'
+
+-- 5B TỔNG TIỀN NGUYÊN LIỆU NHẬP TÊN LÀ CÁ
+SELECT SUM(nl.DONGIA * cthdn.SOLUONG) AS "tong tien"
+FROM nguyen_lieu nl, chi_tiet_hoa_don_nhap cthdn
+WHERE nl.TENNL = N'CÁ' AND NL.MANL = cthdn.MANL
+
+
+
+--6C HIỂN THỊ THÔNG TIN NHÂN VIÊN ĐÃ PHỤC VỤ TRONG NGÀY 19/82021
+SELECT kh.TENKH,nv.TENNV
+FROM
+    khach_hang kh 
+    LEFT JOIN hoa_don hd ON kh.MKH = hd.MKH
+    LEFT JOIN nhan_vien nv on hd.MNV = nv.MNV
+    WHERE hd.NGAYTAO = '20210819'
+--7E TỔNG THỜI GIAN LÀM VIỆC VỦA TỪNG NV TRONG NĂM 2021
+SELECT A.TENNV, SUM(C.THOIGIAN) AS TG_LAMVIEC
+FROM NHAN_VIEN A JOIN CHAM_CONG B ON A.MNV = B.MNV JOIN	 CA_LAM_VIEC C ON C.MACA = B.MACA
+WHERE YEAR(B.NGAY)= 2021
+GROUP  BY A.TENNV
+
+
+
+
+
+--============================================================
+--TRÍ
+
+--1A TÊN MÓN ĂN CÓ NGUYÊN LIỆU TỪ NHÀ CUNG CẤP THỊY BÒ QUỐC CHÂU
+ SELECT A.TENSP, A.DONGIA
+ FROM SAN_PHAM A JOIN CHI_TIET_SAN_PHAM B ON A.TENSP = B.TENSP 
+				JOIN NGUYEN_LIEU C ON C.MANL = B.MANL 
+				JOIN CHI_TIET_HOA_DON_NHAP D ON D.MANL = B.MANL 
+				JOIN HOA_DON_NHAP E ON E.MHD = D.MHD 
+				JOIN NHA_CUNG_CAP F ON F.MANCC = E.MANCC
+ WHERE F.TENNCC = N'TRẠI GÀ MINH TRÍ'
+
+ --2B
+ DELETE FROM SAN_PHAM
+ WHERE TENSP NOT IN (SELECT tensp
+				FROM san_pham
+				WHERE msp  IN (SELECT DISTINCT msp 
+									FROM chi_tiet_hoa_don a
+									join hoa_don b on a.mhd = b.mhd
+									where year(ngaytao) = 2022))
+
+
+ --3C MÓN ĂN ĐƯỢC ĐẶT TỪ 2 ĐẾN 5 LẦN TRONG NGÀY ?
+ SELECT c.tensp, count(c.msp) as slg
+FROM hoa_don a
+inner join chi_tiet_hoa_don b on a.mhd = b.mhd
+inner join san_pham c on b.msp = c.msp
+GROUP BY c.tensp, c.msp
+HAVING COUNT(c.msp) BETWEEN 2 AND 4
+--4E MÓN ĂN CHƯA ĐƯỢC ĐẶT TRONG NĂM 2021
+SELECT tensp,MSP
+FROM san_pham
+WHERE msp  NOT IN (SELECT DISTINCT msp 
+				  FROM chi_tiet_hoa_don a
+				  join hoa_don b on a.mhd = b.mhd
+				  where year(ngaytao) = 2021)
+
+
+--5G XOÁ SẢN PHẦM ĐƯỢC ĐẶT ÍT HƠN 2 LẦN
+DELETE FROM SAN_PHAM
+WHERE  tensp in (SELECT c.tensp
+FROM hoa_don a
+inner join chi_tiet_hoa_don b on a.mhd = b.mhd
+inner join san_pham c on b.msp = c.msp
+GROUP BY c.tensp, c.msp
+HAVING COUNT(c.msp) < 2 )
+
+--6G TĂNG GIÁ 20% CÁ SẢN PHẨM CÓ NGUYÊN LIỆU TỪ TÔM
+UPDATE san_pham
+SET dongia *= 1
+from san_pham a
+join chi_tiet_san_pham b on a.tensp = b.tensp
+join nguyen_lieu c on b.manl = c.manl
+WHERE c.tennl = N'Tôm';
+
+-- 7E Cho biết những mặt hàng được bán vào tháng 1 năm 2020 nhưng không được bán vào tháng 2 năm 2020
+(SELECT a.msp, b.tensp, convert(varchar,ngaytao,103) AS NGAYBAN
+FROM chi_tiet_hoa_don a 
+join san_pham b  on a.msp = b.msp  
+join hoa_don c on c.mhd = a.mhd 
+WHERE  year(c.ngaytao) = 2021 and month(c.ngaytao) = 1)
+
+EXCEPT
+
+(SELECT a.msp, b.tensp, convert(varchar,ngaytao,103)
+FROM chi_tiet_hoa_don a 
+join san_pham b on a.msp = b.msp
+join hoa_don c on c.mhd = a.mhd
+WHERE year(c.ngaytao) = 2021 and month(c.ngaytao) = 5)
+
+--===================================================================
+
+-- CHÂU 
+-- CÂU 1 In ra danh sách các nguyên liệu có đơn vị tính là KG và đơn giá lớn hơn 70000 
+SELECT *
+FROM NGUYEN_LIEU
+WHERE DVT='KG' AND DONGIA >70000
+
+
+-- CÂU 2 Tổng số ca và tổng số tiền của từng ca (Aggregate Functions)
+SELECT A.MACA, COUNT(A.MALOAICA) AS SLCA, SUM(B.MUCTHUONG*C.GIATIEN) AS TIEN 
+FROM CHAM_CONG A JOIN LOAI_CA B ON A.MALOAICA = B.MALOAICA
+	JOIN CA_LAM_VIEC C ON A.MACA = C.MACA
+GROUP BY A.MACA
+ 
+-- Câu 3 In ra danh sách tổng nhân viên nữ có chức vụ là lễ tân (Aggregate Functions )
+SELECT COUNT(MNV) AS SL
+FROM NHAN_VIEN
+WHERE GIOITINH=N'Nữ' AND CHUCVU=N'Lễ tân'
+--- Câu 4 tìm nguyên liệu có đơn giá nhỏ nhất (nhỏ nhất)
+SELECT * 
+FROM NGUYEN_LIEU
+WHERE DONGIA =(
+	SELECT MIN(DONGIA) AS MIN 
+	FROM NGUYEN_LIEU)
+
+-- CÂU 5 KHÁCH HÀNG ĐẶT TẤC CẢ CÁC MÓN
+SELECT KH.TENKH
+FROM KHACH_HANG KH INNER JOIN HOA_DON HD ON KH.MKH = HD.MKH
+					INNER JOIN CHI_TIET_HOA_DON A ON HD.MHD = A.MHD
+WHERE NOT EXISTS (
+	SELECT *
+	FROM SAN_PHAM  B1
+	WHERE NOT EXISTS (
+		SELECT *
+		FROM CHI_TIET_HOA_DON A1
+		WHERE A.MHD=A1.MHD AND B1.MSP=A1.MSP ))
+GROUP BY  KH.TENKH
+
+-- CÂU 6 NHÂN VIÊN CHƯA TẠO HOÁ ĐƠN NHẬP NÀO NÀO
+SELECT NV.TENNV
+FROM NHAN_VIEN NV LEFT JOIN HOA_DON_NHAP HDN ON NV.MNV = HDN.MNV
+WHERE HDN.MNV IS NULL
+
+--- Câu 7 cập nhật chức vụ là lễ tân đối với nhân viên chưa lập hóa đơn nhập nào từ nhà cung cấp (update)
+UPDATE NHAN_VIEN
+SET CHUCVU=N'Lễ tân'
+WHERE NHAN_VIEN.TENNV =(
+	SELECT NV.TENNV
+	FROM NHAN_VIEN NV LEFT JOIN HOA_DON_NHAP HDN ON NV.MNV = HDN.MNV
+	WHERE HDN.MNV IS NULL)
+
+
+
+--=============================================== CÂU 4 ======================================
+
+-- funtion
+
+-- trigger
+
+-- proc
