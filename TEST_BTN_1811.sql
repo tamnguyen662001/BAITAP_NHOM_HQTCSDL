@@ -642,6 +642,36 @@ END
 SELECT TENNV ,DBO.F_TUOI_NHANVIEN(NGAYSINH) AS TUOI
 FROM NHAN_VIEN
 
+
+
+--3 THÔNG TIN CA LÀM VIỆC CỦA NHÂN VIÊN CÓ MÃ NHÂN VIÊN LÀ THAM SỐ ĐÂU VÀO
+drop function F_CA_LAM_VIEC
+go
+create function F_CA_LAM_VIEC ( @manv varchar(5),
+								@NGAY DATETIME )
+returns @tableName Table
+(
+	MaNV varchar(5),
+	TenNV nvarchar(50),
+	ngay date,
+	tenca nvarchar (10)
+	
+)
+as
+begin
+	insert into @tableName
+	select a.mnv, a.tennv, b.ngay , c.tenca
+	from nhan_vien a
+	join cham_cong b on a.mnv = b.mnv
+	join ca_lam_viec c on b.maca = c.maca
+	JOIN LOAI_CA D ON D.MALOAICA = B.MALOAICA
+	where a.mnv = @manv and B.NGAY = @NGAY
+	return 
+end
+go
+-- IN THÊM TRƯỜNG LOẠI CA
+GO
+SELECT * FROM F_CA_LAM_VIEC('01','20210101')
 --================================ TRIGGER======================================
 -- 1 KIỂM TRA TÍNH HỢP LỆ CỦA MÃ CA VÀ SỐ THỨ TỰ CA KHI THÊM DỮU LIỆU BẢNG DÒNG CHẤM CÔNG
 INSERT CHAM_CONG VALUES('06','4-3-2020',1,'K1','NL')
@@ -696,9 +726,70 @@ INSERT CHAM_CONG VALUES('06','5-5-2020',5,'K3','NN')
 SELECT * FROM CHAM_CONG
 DELETE FROM CHAM_CONG WHERE MNV = '06'
 
--- 2
--- 3
+--2 KIỂM TRA, UPDATE SỐ LƯỢNG SẢN PHẨM ĐẶT SO VỚI SỐ LƯỢNG HIỆN CÓ
+DROP TRIGGER IF EXISTS dbo.TR_CAPNHAT_SL_SANPHAM;
+CREATE TRIGGER TR_CAPNHAT_SL_SANPHAM ON CHI_TIET_HOA_DON
+FOR INSERT
+AS
+	DECLARE @SL SMALLINT
+	DECLARE @SL1 SMALLINT
+	SELECT @SL = B.SOLUONG FROM CHI_TIET_HOA_DON A, inserted B WHERE A.MSP = B.MSP AND A.MHD = B.MHD
+	SELECT @SL1 = C.SOLUONG FROM CHI_TIET_HOA_DON A, inserted B , SAN_PHAM C WHERE A.MSP = B.MSP AND A.MHD = B.MHD AND C.MSP = A.MSP
+	IF (@SL > @SL1)
+		BEGIN
+			PRINT 'KHONG DAT DUOC, VUOT QUA SO LUONG HANG'
+			ROLLBACK TRAN
+		END
+	UPDATE SAN_PHAM SET SAN_PHAM.SOLUONG = SAN_PHAM.SOLUONG - inserted.SOLUONG
+	FROM inserted WHERE SAN_PHAM.MSP = inserted.MSP 
 
+
+
+--3 Cập nhật lại số lượng sản phẩm khi chỉnh sửa số lượng trong chi tiết hóa đơn
+DROP TRIGGER IF EXISTS dbo.TR_EDITsl_UPDATEslSP;
+CREATE TRIGGER TR_EDITsl_UPDATEslSP On CHI_TIET_HOA_DON
+FOR UPDATE
+AS
+BEGIN 
+	DECLARE @SL SMALLINT
+	DECLARE @SL1 SMALLINT
+	DECLARE @SL2 SMALLINT
+	DECLARE @SLTONG SMALLINT
+	SELECT @SL2 = C.SOLUONG FROM CHI_TIET_HOA_DON A, inserted B , SAN_PHAM C WHERE A.MSP = B.MSP AND A.MHD = B.MHD AND C.MSP = A.MSP
+	SELECT @SL = A.SOLUONG FROM deleted A, inserted B WHERE A.MSP = B.MSP AND A.MHD = B.MHD
+	SELECT @SL1 = B.SOLUONG FROM deleted A, inserted B WHERE A.MSP = B.MSP AND A.MHD = B.MHD
+	IF (@SL < @SL1) -- KHI TĂNG SỐ LƯỢNG LÊN
+		BEGIN 
+			SET @SLTONG = @SL1 - @SL
+			IF (@SLTONG <= @SL2)
+				BEGIN
+					UPDATE SAN_PHAM SET SAN_PHAM.SOLUONG = A.SOLUONG - (@SL1 - @SL)
+					FROM CHI_TIET_HOA_DON B, inserted C  ,SAN_PHAM A
+					WHERE B.MSP = C.MSP AND A.MSP = B.MSP
+				END 
+			ELSE 
+				BEGIN
+					PRINT 'KHONG DAT DUOC, VUOT QUA SO LUONG HANG'
+					ROLLBACK TRAN
+				END 
+		END
+	IF (@SL > @SL1) -- KHI GIẢM SỐ LƯỢNG
+		BEGIN 
+			UPDATE SAN_PHAM SET SAN_PHAM.SOLUONG = A.SOLUONG + (@SL - @SL1)
+			FROM CHI_TIET_HOA_DON B, inserted C  ,SAN_PHAM A
+			WHERE B.MSP = C.MSP AND A.MSP = B.MSP
+		END
+END
+
+
+-- 4 CẬP NHẬT CHI TIẾT SẢN PHẨM KHI XOÁ 1 CHI TIẾT HOÁ ĐƠN
+CREATE TRIGGER TR_XoaCTHD_UPDATEslSP On CHI_TIET_HOA_DON
+FOR DELETE
+AS
+UPDATE SAN_PHAM SET SAN_PHAM.SOLUONG = SAN_PHAM.SOLUONG + KQ.SL
+FROM (SELECT MSP,SUM(SOLUONG) AS SL
+	FROM DELETED
+	GROUP BY MSP) KQ WHERE SAN_PHAM.MSP = KQ.MSP
 -- ===============================PROC==========================================
 --1 
 CREATE PROC SP_NGUYENLIEU_INSERT
@@ -731,5 +822,54 @@ BEGIN
 END
 
 EXEC SP_DS_HOADON_PRINT
+-- 3 
+create proc SP_KHACH_HANG (@makh varchar(5))
+AS
+BEGIN
+declare @tien float
+IF NOT EXISTS (SELECT * FROM khach_hang WHERE mkh = @makh )
+BEGIN
+	PRINT N'Khách hàng này không tồn tại'
+	RETURN -1
+END
 
+ELSE
+begin
+	
+	select @tien = (SELECT SUM(B.SOLUONG*C.DONGIA)
+					FROM HOA_DON A  JOIN CHI_TIET_HOA_DON B ON A.MHD = B.MHD 
+									JOIN SAN_PHAM C ON C.MSP = B.MSP 
+									JOIN KHACH_HANG D ON D.MKH  =A.MKH
+					WHERE A.MKH =@MAKH
+					GROUP BY D.MKH)
+	IF (@tien IS NULL )
+		PRINT N'KHÁCH HÀNG NÀY CHƯA ĐẶT HÀNG'
+
+	if ( @tien >= 200000)
+		begin
+			select DISTINCT a.mkh as N'Mã khách hàng' , a.tenkh as N'Tên khách hàng', @tien as N'Tiền', N'Khách hàng VIP' as N'Thông báo'
+			from khach_hang a
+				join hoa_don b on a.mkh = b.mkh
+				join chi_tiet_hoa_don c on b.mhd = c.mhd
+				join san_pham d on d.msp = c.msp
+			where @makh = a.mkh
+			
+		end
+
+	if ( @tien < 200000)
+		begin
+			select DISTINCT a.mkh as N'Mã khách hàng', a.tenkh as N'Tên khách hàng', @tien as N'Tiền', N'Chưa đủ điểu kiện' as N'Thông báo' 
+			from khach_hang a
+				join hoa_don b on a.mkh = b.mkh
+				join chi_tiet_hoa_don c on b.mhd = c.mhd
+				join san_pham d on d.msp = c.msp
+			where @makh = a.mkh
+			
+		end
+
+end
+END
+GO
+
+EXEC SP_KHACH_HANG KH3
 
