@@ -18,14 +18,19 @@ namespace QLBH_HQTCSDL
             InitializeComponent();
         }
 
+        public class tendn
+        {
+            static public string tk;
+        }
+       
         private void btnLogin_Click(object sender, EventArgs e)
         {
             //MessageBox.Show("Không tồn tại tài khoản !");
 
-            string tk = tbtdn.Text;
+             tendn.tk = tbtdn.Text;
             string mk = tbmk.Text;
-
-            if(Login(tk,mk))
+            
+            if(Login(tendn.tk,mk))
             {
                 MainForm f = new MainForm();
                 this.Hide();

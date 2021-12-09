@@ -60,9 +60,10 @@
             // 
             // tbmk2
             // 
+            this.tbmk2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tbmk2.Location = new System.Drawing.Point(182, 12);
             this.tbmk2.Name = "tbmk2";
-            this.tbmk2.Size = new System.Drawing.Size(215, 20);
+            this.tbmk2.Size = new System.Drawing.Size(215, 22);
             this.tbmk2.TabIndex = 1;
             this.tbmk2.UseSystemPasswordChar = true;
             // 
@@ -114,9 +115,10 @@
             // 
             // tbxacnhanmk
             // 
+            this.tbxacnhanmk.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tbxacnhanmk.Location = new System.Drawing.Point(182, 15);
             this.tbxacnhanmk.Name = "tbxacnhanmk";
-            this.tbxacnhanmk.Size = new System.Drawing.Size(215, 20);
+            this.tbxacnhanmk.Size = new System.Drawing.Size(215, 22);
             this.tbxacnhanmk.TabIndex = 1;
             this.tbxacnhanmk.UseSystemPasswordChar = true;
             this.tbxacnhanmk.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
@@ -127,9 +129,9 @@
             this.lbxacnhanmk.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbxacnhanmk.Location = new System.Drawing.Point(8, 12);
             this.lbxacnhanmk.Name = "lbxacnhanmk";
-            this.lbxacnhanmk.Size = new System.Drawing.Size(160, 21);
+            this.lbxacnhanmk.Size = new System.Drawing.Size(136, 21);
             this.lbxacnhanmk.TabIndex = 0;
-            this.lbxacnhanmk.Text = "Xác Nhận Mật Khẩu";
+            this.lbxacnhanmk.Text = "Đặt lại mật khẩu";
             // 
             // panel4
             // 
@@ -142,9 +144,10 @@
             // 
             // tbtngdung
             // 
+            this.tbtngdung.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tbtngdung.Location = new System.Drawing.Point(182, 17);
             this.tbtngdung.Name = "tbtngdung";
-            this.tbtngdung.Size = new System.Drawing.Size(215, 20);
+            this.tbtngdung.Size = new System.Drawing.Size(215, 22);
             this.tbtngdung.TabIndex = 1;
             // 
             // label2
@@ -166,6 +169,7 @@
             this.btnCapnhat.TabIndex = 7;
             this.btnCapnhat.Text = "Cập Nhật";
             this.btnCapnhat.UseVisualStyleBackColor = true;
+            this.btnCapnhat.Click += new System.EventHandler(this.btnCapnhat_Click);
             // 
             // btnExit2
             // 

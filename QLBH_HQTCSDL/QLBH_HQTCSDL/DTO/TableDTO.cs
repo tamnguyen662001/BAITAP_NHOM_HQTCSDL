@@ -18,15 +18,7 @@ namespace QLBH_HQTCSDL.DTO
             this.Ngaytao = (DateTime?)row["NGAYTAO"];
             this.Mnv = row["MNV"].ToString();
         }
-        public TableDTO(string mhd,string ban, string mkh, DateTime ngaytao, string mnv )
-        {
-            this.Mhd = mhd;
-            this.Ban = ban;
-            this.Mkh = mkh;
-            this.Ngaytao = ngaytao;
-            this.Mnv = mnv;
-             
-        }
+       
         private string mhd;
 
         public string Mhd    

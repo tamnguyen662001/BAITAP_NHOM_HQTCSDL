@@ -30,7 +30,6 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(fLogin));
             this.panel1 = new System.Windows.Forms.Panel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.btnExit = new System.Windows.Forms.Button();
             this.btnLogin = new System.Windows.Forms.Button();
             this.panel3 = new System.Windows.Forms.Panel();
@@ -40,33 +39,20 @@
             this.tbtdn = new System.Windows.Forms.TextBox();
             this.ltdn = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.pictureBox1);
             this.panel1.Controls.Add(this.btnExit);
             this.panel1.Controls.Add(this.btnLogin);
             this.panel1.Controls.Add(this.panel3);
             this.panel1.Controls.Add(this.panel2);
-            this.panel1.Location = new System.Drawing.Point(12, 12);
+            this.panel1.Location = new System.Drawing.Point(12, -81);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(281, 355);
+            this.panel1.Size = new System.Drawing.Size(281, 345);
             this.panel1.TabIndex = 0;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.BackgroundImage")));
-            this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.pictureBox1.ErrorImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.ErrorImage")));
-            this.pictureBox1.Location = new System.Drawing.Point(92, 16);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(92, 72);
-            this.pictureBox1.TabIndex = 5;
-            this.pictureBox1.TabStop = false;
             // 
             // btnExit
             // 
@@ -115,9 +101,9 @@
             this.lmk.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lmk.Location = new System.Drawing.Point(8, 11);
             this.lmk.Name = "lmk";
-            this.lmk.Size = new System.Drawing.Size(83, 21);
+            this.lmk.Size = new System.Drawing.Size(82, 21);
             this.lmk.TabIndex = 0;
-            this.lmk.Text = "Mật Khẩu";
+            this.lmk.Text = "Mật khẩu";
             // 
             // panel2
             // 
@@ -142,9 +128,9 @@
             this.ltdn.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ltdn.Location = new System.Drawing.Point(8, 19);
             this.ltdn.Name = "ltdn";
-            this.ltdn.Size = new System.Drawing.Size(128, 21);
+            this.ltdn.Size = new System.Drawing.Size(123, 21);
             this.ltdn.TabIndex = 0;
-            this.ltdn.Text = "Tên Đăng Nhập";
+            this.ltdn.Text = "Tên đăng nhập";
             // 
             // fLogin
             // 
@@ -152,7 +138,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnExit;
-            this.ClientSize = new System.Drawing.Size(305, 379);
+            this.ClientSize = new System.Drawing.Size(305, 269);
             this.Controls.Add(this.panel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "fLogin";
@@ -160,7 +146,6 @@
             this.Text = "Đăng Nhập";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.fLogin_FormClosing);
             this.panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             this.panel2.ResumeLayout(false);
@@ -180,7 +165,6 @@
         private System.Windows.Forms.Label ltdn;
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.Button btnLogin;
-        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 

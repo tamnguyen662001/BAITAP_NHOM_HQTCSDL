@@ -35,6 +35,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,11 +52,16 @@
     <Compile Include="DAO\BillCheckOutDAO.cs" />
     <Compile Include="DAO\BillDAO.cs" />
     <Compile Include="DAO\BillDetailDAO.cs" />
+    <Compile Include="DAO\CategoryDAO.cs" />
     <Compile Include="DAO\DataProvider.cs" />
+    <Compile Include="DAO\FoodDAO.cs" />
     <Compile Include="DAO\LoadTableDAO.cs" />
+    <Compile Include="DTO\AccountDTO.cs" />
     <Compile Include="DTO\BillCheckOutDTO.cs" />
     <Compile Include="DTO\BillDetailDTO.cs" />
     <Compile Include="DTO\BillDTO.cs" />
+    <Compile Include="DTO\CategoryDTO.cs" />
+    <Compile Include="DTO\FoodDTO.cs" />
     <Compile Include="DTO\TableDTO.cs" />
     <Compile Include="FormAcount.cs">
       <SubType>Form</SubType>

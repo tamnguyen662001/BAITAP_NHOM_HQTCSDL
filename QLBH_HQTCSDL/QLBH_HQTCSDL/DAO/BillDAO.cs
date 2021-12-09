@@ -31,5 +31,11 @@ namespace QLBH_HQTCSDL.DAO
                 return -1;
 
         }*/
+        /*public void insertBill(string mhd)
+        {
+            DataProvider.Instance.ExecuteNonQuery("exec them_hoadon ...", new object[] { mhd });
+
+
+        }*/
     }
 }

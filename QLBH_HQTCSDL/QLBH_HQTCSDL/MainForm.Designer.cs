@@ -50,8 +50,6 @@
             this.panel4 = new System.Windows.Forms.Panel();
             this.button1 = new System.Windows.Forms.Button();
             this.tbtongtien = new System.Windows.Forms.TextBox();
-            this.cbbSwitch = new System.Windows.Forms.ComboBox();
-            this.btnSwitch = new System.Windows.Forms.Button();
             this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
             this.btnDiscount = new System.Windows.Forms.Button();
             this.btnCheckout = new System.Windows.Forms.Button();
@@ -195,6 +193,7 @@
             this.btnAddfood.TabIndex = 2;
             this.btnAddfood.Text = "Thêm món";
             this.btnAddfood.UseVisualStyleBackColor = true;
+            this.btnAddfood.Click += new System.EventHandler(this.btnAddfood_Click);
             // 
             // cbbfood
             // 
@@ -211,13 +210,12 @@
             this.cbbtypefood.Name = "cbbtypefood";
             this.cbbtypefood.Size = new System.Drawing.Size(200, 21);
             this.cbbtypefood.TabIndex = 0;
+            this.cbbtypefood.SelectedIndexChanged += new System.EventHandler(this.cbbtypefood_SelectedIndexChanged);
             // 
             // panel4
             // 
             this.panel4.Controls.Add(this.button1);
             this.panel4.Controls.Add(this.tbtongtien);
-            this.panel4.Controls.Add(this.cbbSwitch);
-            this.panel4.Controls.Add(this.btnSwitch);
             this.panel4.Controls.Add(this.numericUpDown2);
             this.panel4.Controls.Add(this.btnDiscount);
             this.panel4.Controls.Add(this.btnCheckout);
@@ -231,7 +229,7 @@
             this.button1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button1.Location = new System.Drawing.Point(4, 8);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(90, 28);
+            this.button1.Size = new System.Drawing.Size(150, 28);
             this.button1.TabIndex = 9;
             this.button1.Text = "Tổng tiền";
             this.button1.UseVisualStyleBackColor = true;
@@ -241,27 +239,9 @@
             this.tbtongtien.Location = new System.Drawing.Point(4, 36);
             this.tbtongtien.Name = "tbtongtien";
             this.tbtongtien.ReadOnly = true;
-            this.tbtongtien.Size = new System.Drawing.Size(90, 20);
+            this.tbtongtien.Size = new System.Drawing.Size(150, 20);
             this.tbtongtien.TabIndex = 8;
             this.tbtongtien.Text = "0";
-            // 
-            // cbbSwitch
-            // 
-            this.cbbSwitch.FormattingEnabled = true;
-            this.cbbSwitch.Location = new System.Drawing.Point(100, 36);
-            this.cbbSwitch.Name = "cbbSwitch";
-            this.cbbSwitch.Size = new System.Drawing.Size(68, 21);
-            this.cbbSwitch.TabIndex = 7;
-            // 
-            // btnSwitch
-            // 
-            this.btnSwitch.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSwitch.Location = new System.Drawing.Point(100, 8);
-            this.btnSwitch.Name = "btnSwitch";
-            this.btnSwitch.Size = new System.Drawing.Size(68, 28);
-            this.btnSwitch.TabIndex = 6;
-            this.btnSwitch.Text = "Bàn";
-            this.btnSwitch.UseVisualStyleBackColor = true;
             // 
             // numericUpDown2
             // 
@@ -341,8 +321,6 @@
         private System.Windows.Forms.ComboBox cbbfood;
         private System.Windows.Forms.ComboBox cbbtypefood;
         private System.Windows.Forms.Panel panel4;
-        private System.Windows.Forms.ComboBox cbbSwitch;
-        private System.Windows.Forms.Button btnSwitch;
         private System.Windows.Forms.NumericUpDown numericUpDown2;
         private System.Windows.Forms.Button btnDiscount;
         private System.Windows.Forms.Button btnCheckout;

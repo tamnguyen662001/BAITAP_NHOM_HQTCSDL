@@ -36,5 +36,12 @@ namespace QLBH_HQTCSDL.DAO
         }
 
 
+        public void insertBillDetail(int soluong, string mhd,string msp)
+        {
+           // DataProvider.Instance.ExecuteNonQuery("exec them_cthoadon @soluong, @mhd,@msp", new object[] { soluong,mhd,msp });
+
+
+        }
+
     }
 }
